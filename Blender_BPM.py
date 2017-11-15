@@ -1,9 +1,11 @@
 import bpy
+import cArray
 import time
 import math
 import random
 import struct
 import binascii
+import os.path
 import numpy as np
 from bpy.props import (StringProperty,
                        BoolProperty,
@@ -59,6 +61,13 @@ enum_items = (
 )
 
 class MySettings(PropertyGroup):
+
+    folder_path = StringProperty(
+        name="Data Folder",
+        description="Select the folder with the simulation data.",
+        default="",
+        maxlen=1024,
+        subtype='FILE_PATH')
 
     path = StringProperty(
         name="Data File",
@@ -336,12 +345,23 @@ class Panel(bpy.types.Panel):
         layout = self.layout
         scn = context.scene
         col = layout.column(align=True)
+        box0 = layout.box()
         box1 = layout.box()
         box2 = layout.box()
         box22 = layout.box()
         box3 = layout.box()
         box4 = layout.box()
+
+        box0.label(text="CALCULATION")
+
+        box0.label(text="Select the folder with the data", icon='LIBRARY_DATA_DIRECT')
+
+        box0.prop(scn.my_tool, "folder_path", text="")
+
+        box0.operator("particle.calculation", text="Calculate data")
        
+
+
         box1.label(text="PARAMETERS")
 
         box1.label(text="Select the data file", icon='LIBRARY_DATA_DIRECT')
@@ -365,8 +385,6 @@ class Panel(bpy.types.Panel):
         box2.label(text="SIMULATION")
 
         box2.operator("particle.calculator", text="Run Simulation")
-
-        #box2.operator("particle.stabilizer", text="Place Particles")
 
         box2.operator("reset.image", text="Reset Environment")
 
@@ -957,7 +975,75 @@ def unregister():
 if __name__ == "__main__":
     register() 
 
+bl_info = {    
+    "name": "Particles Calculation",    
+    "category": "Object",
+}
 
-  
+#*************************************************************************# 
+# ----------------------------------------------------------------------- #
+#    Particles calculation                                                #
+# ----------------------------------------------------------------------- #
+#*************************************************************************# 
+
+class ParticlesCalculation(bpy.types.Operator):
+    """My Object Moving Script"""               # blender will use this as a tooltip for menu items and buttons.
+    bl_idname = "particle.calculation"           # unique identifier for buttons and menu items to reference.
+    bl_label = "Particles Calculation"        # display name in the interface.
+    bl_options = {'REGISTER', 'UNDO'}           # enable undo for the operator.
+   
+    def execute(self,context):        # execute() is called by blender when running the operator.
+        
+        def error_message(self, context):
+            self.layout.label("Imposible to read psi data from the selected folder.")
+
+        #Takes the data from the folder with all psi files
+        try:
+            path = bpy.data.scenes['Scene'].my_tool.folder_path #Origin from where the data will be readen, selected by the first option in the Panel
+            
+            psi_files_number=0
+
+            while (os.path.isfile(path+ str(psi_files_number) +"psi")):
+                psi_files_number += 1
+
+        except:
+            bpy.context.window_manager.popup_menu(error_message, title="An error ocurred", icon='CANCEL')
+    
+        #number of 3D points for each step
+        number_of_points=1000
+        #3D matrix creation
+        matrix_3d = np.zeros((psi_files_number,number_of_points,4))
+
+        #Data storage matrix
+        array_aux = np.zeros((number_of_points, 4))
+
+        for cont_file in range(0, psi_files_number):
+
+            file_with_binary_data = open(path+ str(cont_file) +"psi", 'rb+') #File with binary data
+
+            array_with_all_data = np.load(file_with_binary_data) #Gets the binary data as an array with 6 vectors (x_data, x_probability, y_data, y_probability, z_data, z_probability)
+
+            #Matrix with the data of the 2D grid
+            Z = array_with_all_data['arr_0'] 
+
+            cArray.matrix2Dprob(Z, array_aux)
+            matrix_3d[cont_file]=array_aux
+        
+        path=bpy.data.scenes['Scene'].my_tool.folder_path
+        
+        f = open(path + '3dData.3d', 'wb+')
+        np.savez(f, matrix_3d)
+        f.close()
+
+        return {'FINISHED'}            # this lets blender know the operator finished successfully.
+
+# ------------------------------------------------------------------------
+#    Register and unregister functions
+# ------------------------------------------------------------------------
+
+def register():
+    bpy.utils.register_class(ParticlesCalculation)
 
 
+def unregister():
+    bpy.utils.unregister_class(ParticlesCalculation)
