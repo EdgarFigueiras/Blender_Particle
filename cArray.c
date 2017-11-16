@@ -1,8 +1,7 @@
-//myModule.c//
+//cArray.c//
 
 #include <Python.h>
 #include <numpy/arrayobject.h>
-//#include "C_array.h"
 #include <math.h>
 #include <time.h>
 #include <stdlib.h>

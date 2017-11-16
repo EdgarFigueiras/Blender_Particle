@@ -358,7 +358,7 @@ class Panel(bpy.types.Panel):
 
         box0.prop(scn.my_tool, "folder_path", text="")
 
-        box0.operator("particle.calculation", text="Calculate data")
+        box0.operator("particles.calculation", text="Calculate data")
        
 
 
@@ -988,7 +988,7 @@ bl_info = {
 
 class ParticlesCalculation(bpy.types.Operator):
     """My Object Moving Script"""               # blender will use this as a tooltip for menu items and buttons.
-    bl_idname = "particle.calculation"           # unique identifier for buttons and menu items to reference.
+    bl_idname = "particles.calculation"           # unique identifier for buttons and menu items to reference.
     bl_label = "Particles Calculation"        # display name in the interface.
     bl_options = {'REGISTER', 'UNDO'}           # enable undo for the operator.
    
@@ -1010,7 +1010,7 @@ class ParticlesCalculation(bpy.types.Operator):
             bpy.context.window_manager.popup_menu(error_message, title="An error ocurred", icon='CANCEL')
     
         #number of 3D points for each step
-        number_of_points=1000
+        number_of_points=5000
         #3D matrix creation
         matrix_3d = np.zeros((psi_files_number,number_of_points,4))
 
@@ -1030,7 +1030,7 @@ class ParticlesCalculation(bpy.types.Operator):
             matrix_3d[cont_file]=array_aux
         
         path=bpy.data.scenes['Scene'].my_tool.folder_path
-        
+
         f = open(path + '3dData.3d', 'wb+')
         np.savez(f, matrix_3d)
         f.close()
