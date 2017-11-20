@@ -384,7 +384,7 @@ class Panel(bpy.types.Panel):
 
         box2.label(text="SIMULATION")
 
-        box2.operator("particle.calculator", text="Run Simulation")
+        box2.operator("particle.calculator", text="Place Particles")
 
         box2.operator("reset.image", text="Reset Environment")
 
@@ -520,16 +520,14 @@ class ParticleCalculator(bpy.types.Operator):
         def size_prob(prob):
             size = 0.10
             if (prob > 0.05):
-                size = 0.22
+                size = 0.55
             if (prob <= 0.05 and prob > 0.02):
-                size = 0.15     
+                size = 0.48     
             if (prob <= 0.02 and prob > 0.005):
-                size = 0.10  
+                size = 0.34  
             if (prob <= 0.005):
-                size = 0.08      
+                size = 0.25      
             return size 
-        
-
 
 
         def material_prob(prob):
@@ -719,17 +717,19 @@ class ParticlesForward(bpy.types.Operator):
                 emitter = bpy.data.objects['Sphere.' + str(x)]
             return emitter
 
+        #Vortex
         def size_prob(prob):
             size = 0.10
             if (prob > 0.05):
-                size = 0.22
+                size = 0.55
             if (prob <= 0.05 and prob > 0.02):
-                size = 0.15     
+                size = 0.48     
             if (prob <= 0.02 and prob > 0.005):
-                size = 0.10  
+                size = 0.34  
             if (prob <= 0.005):
-                size = 0.08      
+                size = 0.25      
             return size 
+
 
         def material_prob(prob):
             #Fixes the brightness according to the probability of appearing, 
@@ -866,17 +866,19 @@ class ParticlesBackward(bpy.types.Operator):
                 emitter = bpy.data.objects['Sphere.' + str(x)]
             return emitter
 
+        #Vortex
         def size_prob(prob):
             size = 0.10
             if (prob > 0.05):
-                size = 0.22
+                size = 0.55
             if (prob <= 0.05 and prob > 0.02):
-                size = 0.15     
+                size = 0.48     
             if (prob <= 0.02 and prob > 0.005):
-                size = 0.10  
+                size = 0.34  
             if (prob <= 0.005):
-                size = 0.08      
+                size = 0.25      
             return size 
+
 
         def material_prob(prob):
             #Fixes the brightness according to the probability of appearing, 
@@ -1017,6 +1019,7 @@ class ParticlesCalculation(bpy.types.Operator):
         #Data storage matrix
         array_aux = np.zeros((number_of_points, 4))
 
+        path=bpy.data.scenes['Scene'].my_tool.folder_path
         for cont_file in range(0, psi_files_number):
 
             file_with_binary_data = open(path+ str(cont_file) +"psi", 'rb+') #File with binary data
@@ -1029,8 +1032,6 @@ class ParticlesCalculation(bpy.types.Operator):
             cArray.matrix2Dprob(Z, array_aux)
             matrix_3d[cont_file]=array_aux
         
-        path=bpy.data.scenes['Scene'].my_tool.folder_path
-
         f = open(path + '3dData.3d', 'wb+')
         np.savez(f, matrix_3d)
         f.close()

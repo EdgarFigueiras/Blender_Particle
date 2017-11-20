@@ -69,12 +69,14 @@ static PyObject* matrix2D(PyObject* self, PyObject* args)
     f_out=matout->dimensions[0];
     c_out=matout->dimensions[1];
 
-    double random = randomInRange(0,1.0);
-    int random_pointer_x = (int) randomInRange(0,f_in);
-    int random_pointer_y = (int) randomInRange(0,c_in);
+    double random = 0;
+    int random_pointer_x = 0;
+    int random_pointer_y = 0;
 
     for (int i=0; i<f_out; i++)  {
-        random = randomInRange(0,1);
+        random = randomInRange(0,1.0);
+        random_pointer_x = (int) randomInRange(0,f_in);
+        random_pointer_y = (int) randomInRange(0,c_in);
         while (random > cin[random_pointer_x][random_pointer_y])
         {
             random = randomInRange(0,1);
@@ -117,12 +119,14 @@ static PyObject* matrix2Dprob(PyObject* self, PyObject* args)
     f_out=matout->dimensions[0];
     c_out=matout->dimensions[1];
 
-    double random = randomInRange(0,1.0);
-    int random_pointer_x = (int) randomInRange(0,f_in);
-    int random_pointer_y = (int) randomInRange(0,c_in);
+    double random = 0;
+    int random_pointer_x = 0;
+    int random_pointer_y = 0;
 
     for (int i=0; i<f_out; i++)  {
-        random = randomInRange(0,1);
+        random = randomInRange(0,1.0);
+        random_pointer_x = (int) randomInRange(0,f_in);
+        random_pointer_y = (int) randomInRange(0,c_in);
         while (random > cin[random_pointer_x][random_pointer_y])
         {
             random = randomInRange(0,1);
@@ -132,7 +136,7 @@ static PyObject* matrix2Dprob(PyObject* self, PyObject* args)
         cout[i][0] = random_pointer_x - f_in/2 + randomInRange(0,0.52); //n has the Z size (len(Z[n](m))), with this substraction operation valuer are better balanced
         cout[i][1] = random_pointer_y - f_in/2 + randomInRange(0,0.52); //because the final objective is show them in a 3D grid
         cout[i][2] = random;
-        cout[i][3] = cin[random_pointer_x][random_pointer_y]
+        cout[i][3] = cin[random_pointer_x][random_pointer_y];
     }
 
     n=1;
